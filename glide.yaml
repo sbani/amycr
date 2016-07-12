@@ -1,0 +1,18 @@
+package: github.com/sbani/cr
+import:
+- package: github.com/spf13/cobra
+- package: github.com/julienschmidt/httprouter
+  version: ~1.1.0
+- package: github.com/Sirupsen/logrus
+  version: ~0.10.0
+- package: github.com/pkg/errors
+  version: ~0.7.0
+- package: golang.org/x/net
+  subpackages:
+  - context
+- package: github.com/spf13/viper
+- package: github.com/xeipuuv/gojsonschema
+- package: github.com/boltdb/bolt
+  version: ~1.2.1
+- package: github.com/satori/go.uuid
+  version: ~1.1.0
