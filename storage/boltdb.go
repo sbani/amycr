@@ -1,11 +1,20 @@
 package storage
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/boltdb/bolt"
+	"github.com/evanphx/json-patch"
 	"github.com/pkg/errors"
 )
 
+var (
+	historyBucket = []byte("history")
+)
+
+// BoltManager is the Manager for the Key-Value-Store Boltdb
 type BoltManager struct {
 	db *bolt.DB
 }
@@ -24,37 +33,60 @@ func newBoltManager() *BoltManager {
 	return manager
 }
 
-func (m *BoltManager) CreateRecord(contentType, content []byte) ([]byte, error) {
-	return m.InsertRevision(contentType, GenerateID(), content)
+// RecordToJSON inserts a new record
+func (m *BoltManager) RecordToJSON(contentType, content []byte) (Record, error) {
+	newRecord := NewRecord(GenerateID(), content)
+	return m.InsertRevision(contentType, newRecord, nil)
 }
 
-func (m *BoltManager) CreateRecordWithId(contentType, id, content []byte) ([]byte, error) {
-	return m.InsertRevision(contentType, id, content)
+// RecordToJSONWithID inserts a new record but adds a fixed key (e.g.)
+func (m *BoltManager) RecordToJSONWithID(contentType, id, content []byte) (Record, error) {
+	newRecord := NewRecord(id, content)
+	return m.InsertRevision(contentType, newRecord, nil)
 }
 
-func (m *BoltManager) InsertRevision(contentType, id, content []byte) ([]byte, error) {
-	err := m.db.Batch(func(tx *bolt.Tx) error {
-		buf, err := CreateRecordJSON(id, content)
+// UpdateRecord updates record to a new version
+func (m *BoltManager) UpdateRecord(contentType, id, content []byte) (Record, error) {
 
-		// Add to record bucket
+	return m.InsertRevision(contentType, id, oldId, content)
+}
+
+// InsertRevision adds a new revision viewing the old id
+func (m *BoltManager) InsertRevision(contentType []byte, newRecord Record, oldRecord Record) (Record, error) {
+	storeContent, err := RecordToJSON(newRecord)
+	if err != nil {
+		return errors.Wrap(err, "BoltDB Store")
+	}
+
+	err = m.db.Batch(func(tx *bolt.Tx) error {
+		// Get record bucket for contentType
 		br, err := tx.CreateBucketIfNotExists(contentType)
 		if err != nil {
 			return err
 		}
 
-		// Add to history bucket
-		bh, err := tx.CreateBucketIfNotExists(contentType)
-		buf, err := CreateRecordJSON(id, content)
+		// Get history bucket for contentType
+		bh, err := br.CreateBucketIfNotExists(historyBucket)
 		if err != nil {
 			return err
 		}
 
-		return b.Put(id, buf)
+		diffPatch, err := jsonpatch.CreateMergePatch(oldRecord.Content, newRecord.Content)
+		if err != nil {
+			return err
+		}
+
+		timedID := fmt.Sprintf("%d/%s", time.Now().UnixNano(), newRecord.ID)
+		bh.Put([]byte(timedID), diffPatch)
+
+		// Store/Update id
+		return br.Put(newRecord.ID, storeContent)
 	})
 
-	return id, err
+	return newRecord, err
 }
 
+// HasRecord returns if the record for id exists
 func (m *BoltManager) HasRecord(contentType, id []byte) bool {
 	var value []byte
 	m.db.View(func(tx *bolt.Tx) error {

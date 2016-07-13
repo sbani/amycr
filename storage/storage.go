@@ -7,8 +7,6 @@ import (
 
 func newManager(c *config.Config) (Manager, error) {
 	switch c.Storage {
-	case "memory":
-		return newMemoryManager(), nil
 	case "boltdb":
 		return newBoltManager(), nil
 	}

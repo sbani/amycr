@@ -9,35 +9,38 @@ import (
 	"github.com/pkg/errors"
 )
 
-// RecordJSON represents the ready to use json from storage
-type RecordJSON struct {
+// Record represents the ready to use json from storage
+type Record struct {
 	ID       []byte
 	Revision time.Time
 	Content  []byte
 }
 
-// CreateRecordJSON adds id and revision to the content given by user
-func CreateRecordJSON(id []byte, content []byte) ([]byte, error) {
-	var b []byte
-	record := RecordJSON{
+// NewRecord create a new record
+func NewRecord(id []byte, content []byte) Record {
+	return Record{
 		ID:       id,
 		Revision: time.Now(),
 		Content:  content,
 	}
+}
+
+// RecordToJSON create json blog from record
+func RecordToJSON(record Record) ([]byte, error) {
 	b, err := json.Marshal(record)
 	if err != nil {
-		return b, errors.Wrap(err, "CreateRecordJSON")
+		return b, errors.Wrap(err, "RecordToJSON")
 	}
 
 	return b, nil
 }
 
-// GetRecordJSON unmarshalls the record json data
-func GetRecordJSON(jsonBlob []byte) (RecordJSON, error) {
-	var record RecordJSON
-	err := json.UnMarshal(jsonBlob, &record)
+// RecordFromJSON unmarshalls the record json data and returns a Record
+func RecordFromJSON(jsonBlob []byte) (Record, error) {
+	var record Record
+	err := json.Unmarshal(jsonBlob, &record)
 	if err != nil {
-		return record, errors.Wrap(err, "GetRecordJSON")
+		return record, errors.Wrap(err, "RecordFromJSON")
 	}
 
 	return record, nil
