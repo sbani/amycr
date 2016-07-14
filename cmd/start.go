@@ -1,13 +1,10 @@
 package cmd
 
 import (
-	"net/http"
-
 	"github.com/Sirupsen/logrus"
-	"github.com/julienschmidt/httprouter"
-	"github.com/pkg/errors"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/engine/standard"
 	"github.com/sbani/gcr/cmd/cli/server"
-	"github.com/sbani/gcr/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -27,18 +24,9 @@ func init() {
 }
 
 func runServerStart(cmd *cobra.Command, args []string) {
-	router := httprouter.New()
 	serverHandler := &server.Handler{}
-	serverHandler.Start(c, router)
-
-	http.Handle("/", router)
-
-	var srv = http.Server{
-		Addr: c.GetAddress(),
-	}
+	serverHandler.Start(c, echo.New())
 
 	logrus.Infof("Starting server on %s", srv.Addr)
-	err := srv.ListenAndServe()
-
-	pkg.Must(errors.Wrap(err, "Could not start server"))
+	e.Run(standard.New(c.GetAddress()))
 }

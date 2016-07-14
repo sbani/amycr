@@ -5,9 +5,9 @@ import (
 	"github.com/sbani/gcr/config"
 )
 
-func NewManager(c *config.Config) (Manager, error) {
+func NewManager(c *config.Config) (*Manager, error) {
 	switch c.Storage {
-	case "boltdb":
+	case config.BoltDBKey:
 		return newBoltManager(), nil
 	}
 

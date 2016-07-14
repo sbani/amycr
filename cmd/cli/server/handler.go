@@ -1,7 +1,8 @@
 package server
 
 import (
-	"github.com/julienschmidt/httprouter"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"github.com/pkg/errors"
 	"github.com/sbani/gcr/config"
 	"github.com/sbani/gcr/contenttype"
@@ -11,15 +12,20 @@ import (
 
 // Handler holds all other handlers and prepares them for routing
 type Handler struct {
+	e           *echo.Echo
 	ContentType *contenttype.Handler
 }
 
 // Start the handler and bootrap all others
-func (h *Handler) Start(c *config.Config, router *httprouter.Router) {
+func (h *Handler) Start(c *config.Config, e *echo.Echo) {
 	storage, err := storage.NewManager(c)
 	if err != nil {
 		pkg.Must(errors.Wrap(err, "Storage"))
 	}
 
-	h.ContentType = newContentTypeHandler(c, router, &storage)
+	e.Pre(middleware.RemoveTrailingSlash())
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	h.ContentType = newContentTypeHandler(c, e, storage)
 }

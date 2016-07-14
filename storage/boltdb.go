@@ -18,7 +18,7 @@ var (
 
 // BoltManager is the Manager for the Key-Value-Store Boltdb
 type BoltManager struct {
-	db *bolt.DB
+	DB *bolt.DB
 }
 
 // newBoltManager is the factore method for BoltManager
@@ -29,7 +29,7 @@ func newBoltManager() *BoltManager {
 	}
 
 	manager := &BoltManager{
-		db: db,
+		DB: db,
 	}
 
 	return manager
@@ -48,7 +48,7 @@ func (m *BoltManager) PutRecord(r *Record) error {
 // GetRecord a single entry
 func (m *BoltManager) GetRecord(contentType, key []byte) (Record, error) {
 	var content []byte
-	m.db.View(func(tx *bolt.Tx) error {
+	m.DB.View(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(contentTypeBucket)
 		if err != nil {
 			return errors.Wrap(err, "BoltDB: Bucket")
@@ -62,7 +62,7 @@ func (m *BoltManager) GetRecord(contentType, key []byte) (Record, error) {
 
 // DeleteRecord removes a single record
 func (m *BoltManager) DeleteRecord(r Record) error {
-	return m.db.Batch(func(tx *bolt.Tx) error {
+	return m.DB.Batch(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(r.ContentType)
 		if err != nil {
 			return errors.Wrap(err, "BoltDB: Bucket")
@@ -97,7 +97,7 @@ func (m *BoltManager) InsertRevision(newRecord *Record, oldRecord Record) error 
 		return errors.Wrap(err, "BoltDB")
 	}
 
-	err = m.db.Batch(func(tx *bolt.Tx) error {
+	err = m.DB.Batch(func(tx *bolt.Tx) error {
 		// Get record bucket for contentType
 		br, err := tx.CreateBucketIfNotExists(newRecord.ContentType)
 		if err != nil {
@@ -127,7 +127,7 @@ func (m *BoltManager) InsertRevision(newRecord *Record, oldRecord Record) error 
 // FindNextRevision searches for the next revision (one older) of a given record
 func (m *BoltManager) FindNextRevision(r *Record) (Record, error) {
 	var value []byte
-	m.db.View(func(tx *bolt.Tx) error {
+	m.DB.View(func(tx *bolt.Tx) error {
 		bh := tx.Bucket(r.ContentType).Bucket(historyBucket)
 
 		// Timed key is {key}/timestamp
@@ -159,7 +159,7 @@ func (m *BoltManager) FindNextRevision(r *Record) (Record, error) {
 
 // PutContentType updates or creates a content type by key
 func (m *BoltManager) PutContentType(c *ContentType) error {
-	return m.db.Update(func(tx *bolt.Tx) error {
+	return m.DB.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(contentTypeBucket)
 		if err != nil {
 			return errors.Wrap(err, "BoltDB: Bucket")
@@ -172,7 +172,7 @@ func (m *BoltManager) PutContentType(c *ContentType) error {
 // GetContentType a single entry
 func (m *BoltManager) GetContentType(key []byte) (ContentType, error) {
 	var content []byte
-	m.db.View(func(tx *bolt.Tx) error {
+	m.DB.View(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(contentTypeBucket)
 		if err != nil {
 			return errors.Wrap(err, "BoltDB: Bucket")
@@ -186,7 +186,7 @@ func (m *BoltManager) GetContentType(key []byte) (ContentType, error) {
 
 // DeleteContentType removes a content type from storage and the bucket for contenttype
 func (m *BoltManager) DeleteContentType(c ContentType) error {
-	return m.db.Batch(func(tx *bolt.Tx) error {
+	return m.DB.Batch(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(contentTypeBucket)
 		if err != nil {
 			return errors.Wrap(err, "BoltDB: Bucket")
