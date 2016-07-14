@@ -35,6 +35,8 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gcr.yaml)")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -46,8 +48,8 @@ func initConfig() {
 	}
 
 	path := absPathify("$HOME")
-	if _, err := os.Stat(filepath.Join(path, ".hydra.yml")); err != nil {
-		_, _ = os.Create(filepath.Join(path, ".hydra.yml"))
+	if _, err := os.Stat(filepath.Join(path, ".gcr.yml")); err != nil {
+		_, _ = os.Create(filepath.Join(path, ".gcr.yml"))
 	}
 
 	viper.SetConfigType("yaml")

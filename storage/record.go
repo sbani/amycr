@@ -3,6 +3,7 @@ package storage
 import (
 	"crypto/sha1"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -11,32 +12,24 @@ import (
 
 // Record represents the ready to use json from storage
 type Record struct {
-	Key      []byte
-	Revision time.Time
-	Content  []byte
+	Key         []byte
+	ContentType []byte
+	Revision    time.Time
+	Content     []byte
 }
 
 // NewRecord create a new record
-func NewRecord(Key []byte, content []byte) Record {
+func NewRecord(contentType, key, content []byte) Record {
 	return Record{
-		Key:      Key,
-		Revision: time.Now(),
-		Content:  content,
+		Key:         key,
+		ContentType: contentType,
+		Revision:    time.Now(),
+		Content:     content,
 	}
 }
 
-// RecordToJSON create json blog from record
-func RecordToJSON(record Record) ([]byte, error) {
-	b, err := json.Marshal(record)
-	if err != nil {
-		return b, errors.Wrap(err, "RecordToJSON")
-	}
-
-	return b, nil
-}
-
-// RecordFromJSON unmarshalls the record json data and returns a Record
-func RecordFromJSON(jsonBlob []byte) (Record, error) {
+// NewRecordFromJSON unmarshalls the record json data and returns a Record
+func NewRecordFromJSON(jsonBlob []byte) (Record, error) {
 	var record Record
 	err := json.Unmarshal(jsonBlob, &record)
 	if err != nil {
@@ -44,6 +37,21 @@ func RecordFromJSON(jsonBlob []byte) (Record, error) {
 	}
 
 	return record, nil
+}
+
+// ToJSON create json blog from record
+func (r Record) ToJSON() ([]byte, error) {
+	b, err := json.Marshal(r)
+	if err != nil {
+		return b, errors.Wrap(err, "ToJSON")
+	}
+
+	return b, nil
+}
+
+// TimedKey creates a key with {key}/timestamp
+func (r Record) TimedKey() []byte {
+	return []byte(fmt.Sprintf("%s/%d", r.Key, r.Revision.UnixNano()))
 }
 
 var hasher = sha1.New()

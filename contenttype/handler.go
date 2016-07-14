@@ -9,7 +9,7 @@ import (
 
 // Handler is the Handler for contenttype
 type Handler struct {
-	Manager *storage.Manager
+	Storage *storage.Manager
 }
 
 const (
