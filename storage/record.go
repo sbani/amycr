@@ -11,15 +11,15 @@ import (
 
 // Record represents the ready to use json from storage
 type Record struct {
-	ID       []byte
+	Key      []byte
 	Revision time.Time
 	Content  []byte
 }
 
 // NewRecord create a new record
-func NewRecord(id []byte, content []byte) Record {
+func NewRecord(Key []byte, content []byte) Record {
 	return Record{
-		ID:       id,
+		Key:      Key,
 		Revision: time.Now(),
 		Content:  content,
 	}
@@ -48,7 +48,7 @@ func RecordFromJSON(jsonBlob []byte) (Record, error) {
 
 var hasher = sha1.New()
 
-// GenerateID creates a unique id for a record
-func GenerateID() []byte {
+// GenerateKey creates a unique Key for a record
+func GenerateKey() []byte {
 	return hasher.Sum([]byte(strconv.FormatInt(time.Now().UnixNano(), 10)))
 }

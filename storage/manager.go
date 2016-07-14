@@ -7,30 +7,33 @@ type Manager interface {
 	// CreateRecord inserts a new record
 	CreateRecord(contentType, content []byte) (Record, error)
 
-	// CreateRecordWithID inserts a new record but adds a fixed key (e.g.)
-	CreateRecordWithID(contentType, id, content []byte) (Record, error)
+	// CreateRecordWithkey inserts a new record but adds a fixed key (e.g.)
+	CreateRecordWithkey(contentType, key, content []byte) (Record, error)
 
 	// UpdateRecord updates record to a new version
-	UpdateRecord(contentType, id, content []byte) (Record, error)
+	UpdateRecord(contentType, key, content []byte) (Record, error)
 
 	// GetContant a single entry
-	GetRecord(contentType, id []byte) (Record, error)
+	GetRecord(contentType, key []byte) (Record, error)
 
 	// HasRecord checks if a record exists in db
-	HasRecord(contentType, id []byte) bool
+	HasRecord(contentType, key []byte) bool
 
 	// DeleteRecord removes a single record
-	DeleteRecord(contentType, id []byte) error
+	DeleteRecord(contentType, key []byte) error
 
 	// Get the recods to a specific time
-	GetRecordRevision(id []byte, t time.Time) (Record, error)
+	GetRecordRevision(key []byte, t time.Time) (Record, error)
 
 	// CreateContentType adds a new content type
-	CreateContentType(id, content []byte) error
+	CreateContentType(key, content []byte) error
+
+	// UpdateContentType updates a content type by key
+	UpdateContentType(key, content []byte) error
 
 	// GetContentType a single entry
-	GetContentType(id []byte) ([]byte, error)
+	GetContentType(key []byte) ([]byte, error)
 
 	// DeleteContentType removes a content type from storage
-	DeleteContentType(id []byte) error
+	DeleteContentType(key []byte) error
 }
