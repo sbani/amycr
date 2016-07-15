@@ -1,9 +1,8 @@
 package contenttype
 
 import (
-	"math/rand"
+	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
@@ -13,7 +12,7 @@ import (
 
 // Handler is the Handler for contenttype
 type Handler struct {
-	Storage *storage.Manager
+	Storage storage.Manager
 }
 
 const (
@@ -25,45 +24,56 @@ const (
 func (h *Handler) SetRoutes(e *echo.Echo) {
 	e.POST(ContentTypeHandlerPath, h.Put)
 	e.PUT(ContentTypeHandlerPath, h.Put)
-	e.GET(ContentTypeHandlerPath, h.Get)
+	e.GET(ContentTypeHandlerPath, h.List)
+	e.GET(ContentTypeHandlerPath+"/:key", h.Get)
 }
 
 // Put api call to create or updates a content type.
 // Expecting a post request
 func (h *Handler) Put(c echo.Context) error {
-	ct := new(storage.ContentType)
+	ct := new(ContentType)
 
 	// Bind input
 	if err := c.Bind(ct); err != nil {
-		return c.JSON(http.StatusBadRequest, errors.Wrap(err, "ContentType Put"))
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	// Validate input
 	if v, err := govalidator.ValidateStruct(ct); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	} else if !v {
-		return c.JSON(http.StatusBadRequest, errors.New("Payload did not validate."))
+		return c.JSON(http.StatusBadRequest, errors.New("Payload did not validate.").Error())
 	}
 
 	// Put to storage
-
-	if err := h.Storage.PutContentType(ct); err != nil {
-		return c.JSON(http.StatusBadRequest, errors.Wrap(err, "Storage"))
+	sct := ct.ToStorageContentType()
+	if err := h.Storage.PutContentType(&sct); err != nil {
+		return c.JSON(http.StatusBadRequest, errors.Wrap(err, "Storage").Error())
 	}
 
-	return c.JSON(http.StatusOK, ct)
+	return c.JSON(http.StatusOK, sct)
+}
+
+// List api call lists all content types
+func (h *Handler) List(c echo.Context) error {
+	contentTypes, err := h.Storage.ListContentTypes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
+	}
+
+	return c.JSON(http.StatusOK, contentTypes)
 }
 
 // Get api call to get content type info
 func (h *Handler) Get(c echo.Context) error {
-	callback := c.QueryParam("callback")
-	var content struct {
-		Response  string    `json:"response"`
-		Timestamp time.Time `json:"timestamp"`
-		Random    int       `json:"random"`
+	key := []byte(c.Param("key"))
+
+	ct, err := h.Storage.GetContentType(key)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
 	}
-	content.Response = "Sent via JSONP"
-	content.Timestamp = time.Now().UTC()
-	content.Random = rand.Intn(1000)
-	return c.JSONP(http.StatusOK, callback, &content)
+
+	fmt.Println(ct)
+
+	return c.JSON(http.StatusOK, ct)
 }

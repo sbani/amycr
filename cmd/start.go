@@ -24,9 +24,13 @@ func init() {
 }
 
 func runServerStart(cmd *cobra.Command, args []string) {
-	serverHandler := &server.Handler{}
-	serverHandler.Start(c, echo.New())
+	e := echo.New()
 
-	logrus.Infof("Starting server on %s", srv.Addr)
-	e.Run(standard.New(c.GetAddress()))
+	serverHandler := new(server.Handler)
+	serverHandler.Start(c, e)
+
+	addr := c.GetAddress()
+
+	logrus.Infof("Starting server on %s", addr)
+	e.Run(standard.New(addr))
 }

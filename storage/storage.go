@@ -5,7 +5,8 @@ import (
 	"github.com/sbani/gcr/config"
 )
 
-func NewManager(c *config.Config) (*Manager, error) {
+// NewManager is the factory method to create the storage manager from config
+func NewManager(c *config.Config) (Manager, error) {
 	switch c.Storage {
 	case config.BoltDBKey:
 		return newBoltManager(), nil

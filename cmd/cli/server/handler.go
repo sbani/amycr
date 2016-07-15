@@ -25,7 +25,6 @@ func (h *Handler) Start(c *config.Config, e *echo.Echo) {
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
 
 	h.ContentType = newContentTypeHandler(c, e, storage)
 }

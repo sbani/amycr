@@ -180,8 +180,33 @@ func (m *BoltManager) GetContentType(key []byte) (ContentType, error) {
 		content = b.Get(key)
 		return nil
 	})
-
+	fmt.Printf("FOUND: key=%s, value=%s", string(key), string(content))
 	return NewContentTypeFromJSON(content)
+}
+
+// ListContentTypes returns a slice of all content types
+func (m *BoltManager) ListContentTypes() ([]ContentType, error) {
+	var contentTypes []ContentType
+	m.DB.View(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists(contentTypeBucket)
+		if err != nil {
+			return errors.Wrap(err, "BoltDB: Bucket")
+		}
+
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			fmt.Printf("FOUND: key=%s, value=%s\n", k, v)
+			ct, err := NewContentTypeFromJSON(v)
+			// TODO: Talk about what happens with failing content types
+			if err == nil {
+				contentTypes = append(contentTypes, ct)
+			}
+		}
+
+		return nil
+	})
+
+	return contentTypes, nil
 }
 
 // DeleteContentType removes a content type from storage and the bucket for contenttype

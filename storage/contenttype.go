@@ -8,8 +8,8 @@ import (
 
 // ContentType explains the content type object
 type ContentType struct {
-	Key        []byte `json:"name" xml:"name" form:"name" valid:"alphanum,required"`
-	Validation []byte `json:"validation" xml:"validation" form:"validation" valid:"required,json"`
+	Key        []byte
+	Validation []byte
 }
 
 // NewContentType create a new content type

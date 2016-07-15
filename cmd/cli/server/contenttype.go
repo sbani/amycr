@@ -8,7 +8,7 @@ import (
 )
 
 // newContentTypeHandler bootraps the hnadler for the content type
-func newContentTypeHandler(c *config.Config, e *echo.Echo, m *storage.Manager) *contenttype.Handler {
+func newContentTypeHandler(c *config.Config, e *echo.Echo, m storage.Manager) *contenttype.Handler {
 	h := &contenttype.Handler{
 		Storage: m,
 	}
