@@ -53,7 +53,13 @@ func (m *BoltManager) GetRecord(contentType, key []byte) (Record, error) {
 		if err != nil {
 			return errors.Wrap(err, "BoltDB: Bucket")
 		}
-		content = b.Get(key)
+
+		v := b.Get(key)
+		if v == nil {
+			return nil
+		}
+
+		copy(content, v)
 		return nil
 	})
 
@@ -177,10 +183,18 @@ func (m *BoltManager) GetContentType(key []byte) (ContentType, error) {
 		if err != nil {
 			return errors.Wrap(err, "BoltDB: Bucket")
 		}
-		content = b.Get(key)
+		content := b.Get(key)
+		if content == nil {
+			return nil
+		}
+
 		return nil
 	})
-	fmt.Printf("FOUND: key=%s, value=%s", string(key), string(content))
+
+	if content == nil {
+		return ContentType{}, nil
+	}
+
 	return NewContentTypeFromJSON(content)
 }
 
@@ -234,4 +248,9 @@ func (m *BoltManager) DeleteContentType(c ContentType) error {
 // generatePrefix generates the scan prefix for a given key and delimiter
 func (m *BoltManager) generatePrefix(key []byte) []byte {
 	return append(key[:], delimiter[:]...)
+}
+
+// GetStats returns stats for the database
+func (m *BoltManager) GetStats() interface{} {
+	return m.DB.Stats()
 }

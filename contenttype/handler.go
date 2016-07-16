@@ -1,7 +1,6 @@
 package contenttype
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -73,7 +72,10 @@ func (h *Handler) Get(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
 	}
 
-	fmt.Println(ct)
+	// empty key means
+	if len(ct.Key) == 0 {
+		return c.JSON(http.StatusNotFound, "Content type not found")
+	}
 
 	return c.JSON(http.StatusOK, ct)
 }

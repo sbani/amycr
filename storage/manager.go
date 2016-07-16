@@ -25,4 +25,7 @@ type Manager interface {
 
 	// DeleteContentType removes a content type from storage
 	DeleteContentType(ContentType) error
+
+	// GetStats returns an interface which then will get json encoded for output
+	GetStats() interface{}
 }
