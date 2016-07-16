@@ -7,7 +7,7 @@ import (
 	"github.com/sbani/gcr/config"
 	"github.com/sbani/gcr/contenttype"
 	"github.com/sbani/gcr/pkg"
-	"github.com/sbani/gcr/statistic"
+	"github.com/sbani/gcr/stats"
 	"github.com/sbani/gcr/storage"
 )
 

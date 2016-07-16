@@ -3,7 +3,7 @@ package server
 import (
 	"github.com/labstack/echo"
 	"github.com/sbani/gcr/config"
-	"github.com/sbani/gcr/statistic"
+	"github.com/sbani/gcr/stats"
 	"github.com/sbani/gcr/storage"
 )
 

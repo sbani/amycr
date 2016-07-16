@@ -1,4 +1,4 @@
-package statistic
+package stats
 
 import (
 	"net/http"
@@ -14,7 +14,7 @@ type Handler struct {
 
 const (
 	// StatisticHandlerPath is the root path for all statistic actions
-	StatisticHandlerPath = "/statistic"
+	StatisticHandlerPath = "/stats"
 )
 
 // SetRoutes adds the routes related to the handler
