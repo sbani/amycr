@@ -170,13 +170,14 @@ func (m *BoltManager) PutContentType(c *ContentType) error {
 		if err != nil {
 			return errors.Wrap(err, "BoltDB: Bucket")
 		}
-
+		fmt.Println("Put key: ", c.Key)
 		return bucket.Put(c.Key, c.Validation)
 	})
 }
 
 // GetContentType a single entry
 func (m *BoltManager) GetContentType(key []byte) (ContentType, error) {
+	fmt.Println("Get key: ", key)
 	var content []byte
 	m.DB.View(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(contentTypeBucket)
