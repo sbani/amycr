@@ -9,7 +9,7 @@ import (
 func NewManager(c *config.Config) (Manager, error) {
 	switch c.Storage {
 	case config.BoltDBKey:
-		return newBoltManager(), nil
+		return NewBoltManager(), nil
 	}
 
 	return nil, errors.Errorf("Manager %s unknown", c.Storage)

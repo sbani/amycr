@@ -1,4 +1,4 @@
-package storage
+package record
 
 import (
 	"crypto/sha1"
@@ -12,10 +12,10 @@ import (
 
 // Record represents the ready to use json from storage
 type Record struct {
-	Key         []byte
-	ContentType []byte
-	Revision    time.Time
-	Content     []byte
+	Key         []byte    `json:"key,string" xml:"key" form:"key" valid:"required,alphanum"`
+	ContentType []byte    `json:"contenttype,string" xml:"contenttype" form:"contenttype" valid:"required,alphanum"`
+	Revision    time.Time `json:"revision,stamp" xml:"content" form:"content" valid:"required,json"`
+	Content     []byte    `json:"content,json" xml:"content" form:"content" valid:"required,json"`
 }
 
 // NewRecord create a new record

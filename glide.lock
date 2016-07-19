@@ -1,8 +1,10 @@
-hash: 23ddc0fb3260422a3ce73667328527866f9c6be0ee50bce73d5eb481073580e3
-updated: 2016-07-14T20:40:31.08920506+02:00
+hash: 88e66af3779ea9ee62c0fbabb8a0b965f708921be224ea92ca514ed869f9c2e7
+updated: 2016-07-17T12:50:19.711202125+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
+- name: github.com/asdine/storm
+  version: e039e69ffcb0d15c8fc8620362f2d4bbc48f4906
 - name: github.com/boltdb/bolt
   version: dfb21201d9270c1082d5fb0f07f500311ff72f18
 - name: github.com/BurntSushi/toml
@@ -42,7 +44,7 @@ imports:
   - bytes
   - color
 - name: github.com/magiconair/properties
-  version: e2f061ecfdaca9f35b2e2c12346ffc526f138137
+  version: af14024f63beeb153d0048591b39c5788f21cc24
 - name: github.com/mattn/go-colorable
   version: 9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59
 - name: github.com/mattn/go-isatty
@@ -58,7 +60,7 @@ imports:
 - name: github.com/spf13/cast
   version: 27b586b42e29bec072fe7379259cc719e1289da6
 - name: github.com/spf13/cobra
-  version: a272c3cbd5ff80a5bf5c5603df50183f9f3f7324
+  version: b24564e919247d7c870fe0ed3738c98d8741aca4
 - name: github.com/spf13/jwalterweatherman
   version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
 - name: github.com/spf13/pflag
@@ -70,15 +72,15 @@ imports:
 - name: github.com/xeipuuv/gojsonschema
   version: 66a3de92def23708184148ae337750915875e7c1
 - name: golang.org/x/net
-  version: a728288923b47049b2ce791836767ffbe964a5bd
+  version: be28236b9034a52ec04f37f16f355b4bde7807e2
   subpackages:
   - context
 - name: golang.org/x/sys
-  version: b518c298ac9dc94b6ac0757394f50d10c5dfa25a
+  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
   subpackages:
   - unix
 - name: gopkg.in/go-playground/validator.v8
-  version: 25f1823069d853eccffbde025dca1812fa09c14b
+  version: 7a080ada5ba072a91fd7f677bcf4d0e1aa286d39
 - name: gopkg.in/yaml.v2
-  version: a83829b6f1293c91addabc89d0571c246397bbf4
+  version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
 testImports: []
