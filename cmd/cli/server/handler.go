@@ -14,6 +14,7 @@ import (
 type Handler struct {
 	e           *echo.Echo
 	ContentType *http.ContentTypeHandler
+	Record      *http.RecordHandler
 	Stats       *http.StatsHandler
 }
 
@@ -28,5 +29,6 @@ func (h *Handler) Start(c *config.Config, e *echo.Echo) {
 	e.Use(middleware.Logger())
 
 	h.ContentType = newContentTypeHandler(c, e, storage.ContentType())
+	h.Record = newRecordHandler(c, e, storage)
 	h.Stats = newStatsHandler(c, e, storage)
 }

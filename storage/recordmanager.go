@@ -8,7 +8,7 @@ type RecordManager interface {
 	Put(*record.Record) error
 
 	// Get return a single record entry
-	Get(key []byte) (*record.Record, error)
+	Get(contentType, key string) (record.Record, error)
 
 	// Delete removes a single record
 	Delete(*record.Record) error

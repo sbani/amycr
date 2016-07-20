@@ -21,10 +21,12 @@ func NewBoltManager() *BoltManager {
 		logrus.Fatal(errors.Wrap(err, "BoldManager"))
 	}
 
+	cs := boltdb.NewContentTypeStore(storm)
+
 	manager := &BoltManager{
 		ORM: storm,
-		r:   boltdb.NewRecordStore(storm),
-		c:   boltdb.NewContentTypeStore(storm),
+		r:   boltdb.NewRecordStore(storm, cs),
+		c:   cs,
 	}
 
 	return manager
@@ -36,9 +38,9 @@ func (m *BoltManager) ContentType() ContentTypeManager {
 }
 
 // Record holds the rocerd manager
-//func (m *BoltManager) Record() RecordManager {
-//	return m.r
-//}
+func (m *BoltManager) Record() RecordManager {
+	return m.r
+}
 
 // GetStats returns stats for the database
 func (m *BoltManager) GetStats() interface{} {

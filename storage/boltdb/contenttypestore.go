@@ -32,7 +32,22 @@ func (s *ContentTypeStore) Get(key string) (contenttype.ContentType, error) {
 
 // Delete removes a single contenttype
 func (s *ContentTypeStore) Delete(c *contenttype.ContentType) error {
-	return s.db.Remove(c)
+	tx, err := s.db.Begin(true)
+	if err != nil {
+		return err
+	}
+
+	// Remove content type itself
+	err = tx.Remove(c)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Remove record buckets
+	_ = tx.Drop(c.Key)
+
+	return tx.Commit()
 }
 
 // FindAll returns a list of all content types

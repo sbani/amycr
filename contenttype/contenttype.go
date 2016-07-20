@@ -2,7 +2,7 @@ package contenttype
 
 // ContentType explains the content type object
 type ContentType struct {
-	Key        string `json:"key" xml:"key" form:"key" valid:"required,alphanum" storm:"id"`
+	Key        string `storm:"id" json:"key" xml:"key" form:"key" valid:"required,alphanum"`
 	Validation string `json:"validation" xml:"validation" form:"validation" valid:"required,json"`
 }
 

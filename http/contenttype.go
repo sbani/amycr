@@ -27,6 +27,7 @@ func (h *ContentTypeHandler) SetRoutes(e *echo.Echo) {
 	e.PUT(ContentTypeHandlerPath, h.Put)
 	e.GET(ContentTypeHandlerPath, h.List)
 	e.GET(ContentTypeHandlerPath+"/:key", h.Get)
+	e.DELETE(ContentTypeHandlerPath+"/:key", h.Delete)
 }
 
 // Put api call to create or updates a content type.
@@ -77,4 +78,24 @@ func (h *ContentTypeHandler) Get(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, ct)
+}
+
+// Delete api action to delete a single content type
+func (h *ContentTypeHandler) Delete(c echo.Context) error {
+	ct, err := h.Storage.Get(c.Param("key"))
+	if err != nil {
+		switch err {
+		case storm.ErrNotFound:
+			return c.JSON(http.StatusNotFound, "Content type not found")
+		default:
+			return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
+		}
+	}
+
+	err = h.Storage.Delete(&ct)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
+	}
+
+	return c.JSON(http.StatusNoContent, "")
 }

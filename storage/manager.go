@@ -3,7 +3,7 @@ package storage
 // Manager interface for storage
 type Manager interface {
 	// Record holds the rocerd manager
-	//Record() RecordManager
+	Record() RecordManager
 
 	// ContentType holds the contenttype manager
 	ContentType() ContentTypeManager
