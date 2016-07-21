@@ -71,7 +71,7 @@ func (h *ContentTypeHandler) Get(c echo.Context) error {
 	if err != nil {
 		switch err {
 		case storm.ErrNotFound:
-			return c.JSON(http.StatusNotFound, "Content type not found")
+			return ErrContentTypeNotFound
 		default:
 			return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
 		}

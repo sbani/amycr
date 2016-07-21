@@ -76,7 +76,7 @@ func (s *RecordStore) Get(contentType, key string) (record.Record, error) {
 // GetRevisions returns a list of revisions for a given record
 func (s *RecordStore) GetRevisions(r *record.Record) ([]record.Revision, error) {
 	var revs []record.Revision
-	err := s.db.From(r.ContentType).Find("Key", r.Key, &revs)
+	err := s.db.From(r.ContentType).From(revisionBucketName).Find("Key", r.Key, &revs)
 
 	return revs, err
 }
@@ -88,15 +88,20 @@ func (s *RecordStore) Delete(r *record.Record) error {
 		return err
 	}
 
-	return s.db.Remove(r)
+	return s.db.From(r.ContentType).Remove(r)
 }
 
 // DeleteRevisions removes all revisions of a record
 func (s *RecordStore) DeleteRevisions(r *record.Record) error {
 	var revs []record.Revision
-	err := s.db.Find("Key", r.Key, &revs)
-	if err != storm.ErrNotFound {
-		return errors.Wrap(err, "ORM")
+	err := s.db.From(r.ContentType).From(revisionBucketName).Find("Key", r.Key, &revs)
+	if err != nil {
+		// If somebody removed the revisions of that record before, it's ok to find anything
+		if err == storm.ErrNotFound {
+			return nil
+		}
+
+		return err
 	}
 
 	for _, revision := range revs {

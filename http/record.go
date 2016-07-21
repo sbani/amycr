@@ -2,12 +2,12 @@ package http
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/asdine/storm"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
-	"github.com/sbani/gcr/contenttype"
 	"github.com/sbani/gcr/record"
 	"github.com/sbani/gcr/storage"
 )
@@ -22,11 +22,15 @@ const (
 	RecordHandlerPath = "/record"
 
 	// RecordContentTypeHandlerPath is the root path for all record actions related to a content type
-	RecordContentTypeHandlerPath = RecordHandlerPath + "/:contenttype"
+	RecordContentTypeHandlerPath = RecordHandlerPath + "/:contenttype/:key"
 )
 
 // SetRoutes adds the routes related to the handler
 func (h *RecordHandler) SetRoutes(e *echo.Echo) {
+	// Not content type based
+	e.POST(RecordHandlerPath, h.Put)
+	e.PUT(RecordHandlerPath, h.Put)
+
 	// Group all routes which need content types and check (and set) the content type
 	g := e.Group(RecordContentTypeHandlerPath)
 	g.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -44,13 +48,7 @@ func (h *RecordHandler) SetRoutes(e *echo.Echo) {
 
 			c.Set("contenttype", ct)
 
-			return next(c)
-		}
-	})
-
-	rg := g.Group("/:key", func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			ct := c.Get("contenttype").(contenttype.ContentType)
+			// Get rocord
 			r, err := h.Storage.Record().Get(ct.Key, c.Param("key"))
 			if err != nil {
 				switch err {
@@ -68,14 +66,10 @@ func (h *RecordHandler) SetRoutes(e *echo.Echo) {
 	})
 
 	// Group related (content type based)
-	g.GET("/:key", h.Get)
-	g.DELETE("/:key", h.Delete)
+	g.GET("", h.Get)
+	g.DELETE("", h.Delete)
 
-	rg.GET("/revisions", h.ListRevisions)
-
-	// Not content type based
-	e.POST(RecordHandlerPath, h.Put)
-	e.PUT(RecordHandlerPath, h.Put)
+	g.GET("/revisions", h.ListRevisions)
 }
 
 // Put api call to create or updates a content type.
@@ -117,23 +111,27 @@ func (h *RecordHandler) ListRevisions(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, errors.Wrap(err, "Storage").Error())
 	}
 
-	return c.JSON(http.StatusOK, revs)
+	data := struct {
+		Count        int               `json:"count"`
+		HeadRevision time.Time         `json:"headRevision"`
+		ContentType  string            `json:"contentType"`
+		Key          string            `json:"key"`
+		Revisions    []record.Revision `json:"revisions"`
+	}{
+		len(revs),
+		r.Revision,
+		r.ContentType,
+		r.Key,
+		revs,
+	}
+
+	return c.JSON(http.StatusOK, data)
 }
 
 // Delete api action to delete a single content type
 func (h *RecordHandler) Delete(c echo.Context) error {
-	ct := c.Get("contenttype").(contenttype.ContentType)
-	r, err := h.Storage.Record().Get(ct.Key, c.Param("key"))
-	if err != nil {
-		switch err {
-		case storm.ErrNotFound:
-			return ErrRecordNotFound
-		default:
-			return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
-		}
-	}
-
-	err = h.Storage.Record().Delete(&r)
+	r := c.Get("record").(record.Record)
+	err := h.Storage.Record().Delete(&r)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
 	}

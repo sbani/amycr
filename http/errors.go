@@ -8,5 +8,5 @@ import (
 
 var (
 	ErrContentTypeNotFound = echo.NewHTTPError(http.StatusNotFound, "ContentType not found")
-	ErrRecordNotFound      = echo.NewHTTPError(http.StatusNotFound, "ContentType not found")
+	ErrRecordNotFound      = echo.NewHTTPError(http.StatusNotFound, "Record not found")
 )

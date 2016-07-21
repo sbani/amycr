@@ -35,7 +35,7 @@ func NewRevision(new *Record, old *Record) (Revision, error) {
 
 	now := time.Now()
 
-	r.ID = fmt.Sprintf("%s/%s", r.Key, now.String())
+	r.ID = fmt.Sprintf("%s/%s", new.Key, now.String())
 	r.Key = new.Key
 	r.CreatedAt = now
 	r.Diff = dmp.DiffToDelta(diffs)
