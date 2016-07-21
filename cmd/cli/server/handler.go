@@ -15,7 +15,7 @@ type Handler struct {
 	e           *echo.Echo
 	ContentType *http.ContentTypeHandler
 	Record      *http.RecordHandler
-	Stats       *http.StatsHandler
+	Storage     *http.StorageHandler
 }
 
 // Start the handler and bootrap all others
@@ -30,5 +30,5 @@ func (h *Handler) Start(c *config.Config, e *echo.Echo) {
 
 	h.ContentType = newContentTypeHandler(c, e, storage.ContentType())
 	h.Record = newRecordHandler(c, e, storage)
-	h.Stats = newStatsHandler(c, e, storage)
+	h.Storage = newStorageHandler(c, e, storage)
 }

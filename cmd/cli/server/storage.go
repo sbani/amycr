@@ -7,9 +7,9 @@ import (
 	"github.com/sbani/gcr/storage"
 )
 
-// newContentTypeHandler bootraps the hnadler for the content type
-func newStatsHandler(c *config.Config, e *echo.Echo, m storage.Manager) *http.StatsHandler {
-	h := &http.StatsHandler{
+// newStorageHandler bootraps the hnadler for all storage actions
+func newStorageHandler(c *config.Config, e *echo.Echo, m storage.Manager) *http.StorageHandler {
+	h := &http.StorageHandler{
 		Storage: m,
 	}
 	h.SetRoutes(e)

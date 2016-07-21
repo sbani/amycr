@@ -11,7 +11,7 @@ type Record struct {
 	Key         string    `storm:"id" json:"key" xml:"key" form:"key" valid:"required"`
 	ContentType string    `storm:"index" json:"contentType" xml:"contentType" form:"contentType" valid:"required,alphanum"`
 	Revision    time.Time `storm:"index" json:"revision" xml:"revision" form:"revision"`
-	Content     string    `json:"content" xml:"content" form:"content" valid:"required,json"`
+	Content     string    `json:"content" xml:"content" form:"content" valid:"required"`
 }
 
 // NewRecord create a new record

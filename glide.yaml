@@ -24,3 +24,8 @@ import:
 - package: github.com/asaskevich/govalidator
   version: ~4.0.0
 - package: github.com/asdine/storm
+- package: github.com/sergi/go-diff
+  subpackages:
+  - diffmatchpatch
+- package: github.com/valyala/fasthttp
+  version: ~20160617.0.0

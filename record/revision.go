@@ -1,15 +1,16 @@
 package record
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/evanphx/json-patch"
 	"github.com/pkg/errors"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 // Revision represents the ready to use json from storage
 type Revision struct {
-	ID        int       `storm:"id" json:"id" xml:"id" form:"id"`
+	ID        string    `storm:"id" json:"id" xml:"id" form:"id"`
 	Key       string    `storm:"index" json:"key" xml:"key" form:"key"`
 	CreatedAt time.Time `storm:"index" json:"createdAt" xml:"createdAt" form:"createdAt"`
 	Diff      string    `json:"content" xml:"content" form:"content"`
@@ -23,19 +24,21 @@ func NewRevision(new *Record, old *Record) (Revision, error) {
 		return r, errors.New("'new' is not allowed to be nil in NewRevision()")
 	}
 
-	var oldContent []byte
+	var oldContent string
 	if old != nil {
-		oldContent = []byte(old.Content)
+		//oldContent = old.Content
+		oldContent = "Voll der alte Content\noder auch nicht?\nfreakazoid"
 	}
 
-	diffPatch, err := jsonpatch.CreateMergePatch(oldContent, []byte(new.Content))
-	if err != nil {
-		return r, errors.Wrap(err, "NewRevision")
-	}
+	dmp := diffmatchpatch.New()
+	diffs := dmp.DiffMain(oldContent, new.Content, true)
 
+	now := time.Now()
+
+	r.ID = fmt.Sprintf("%s/%s", r.Key, now.String())
 	r.Key = new.Key
-	r.CreatedAt = time.Now()
-	r.Diff = string(diffPatch)
+	r.CreatedAt = now
+	r.Diff = dmp.DiffToDelta(diffs)
 
 	return r, nil
 }

@@ -1,8 +1,12 @@
 package storage
 
 import (
+	"strconv"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/asdine/storm"
+	"github.com/boltdb/bolt"
+	"github.com/labstack/echo/engine"
 	"github.com/pkg/errors"
 	"github.com/sbani/gcr/storage/boltdb"
 )
@@ -45,4 +49,14 @@ func (m *BoltManager) Record() RecordManager {
 // GetStats returns stats for the database
 func (m *BoltManager) GetStats() interface{} {
 	return m.ORM.Bolt.Stats()
+}
+
+func (m *BoltManager) BackupDownload(resp engine.Response) error {
+	return m.ORM.Bolt.View(func(tx *bolt.Tx) error {
+		resp.Header().Set("Content-Type", "application/octet-stream")
+		resp.Header().Set("Content-Disposition", `attachment; filename="my.db"`)
+		resp.Header().Set("Content-Length", strconv.Itoa(int(tx.Size())))
+		_, err := tx.WriteTo(resp.Writer())
+		return err
+	})
 }

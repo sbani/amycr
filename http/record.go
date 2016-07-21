@@ -32,25 +32,21 @@ func (h *RecordHandler) SetRoutes(e *echo.Echo) {
 	g := e.Group(RecordContentTypeHandlerPath)
 	g.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			if err := next(c); err != nil {
-				c.Error(err)
-			}
 			// Get content type
+			fmt.Println(c.Param("contenttype"))
 			ct, err := h.Storage.ContentType().Get(c.Param("contenttype"))
 			if err != nil {
 				switch err {
 				case storm.ErrNotFound:
-					return c.JSON(http.StatusNotFound, "Content type not found")
+					return ErrContentTypeNotFound
 				default:
-					return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
+					return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 				}
 			}
 
-			fmt.Println(err, ct)
-
 			c.Set("contenttype", ct)
 
-			return err
+			return next(c)
 		}
 	})
 
@@ -90,7 +86,7 @@ func (h *RecordHandler) Put(c echo.Context) error {
 
 // Get api call to get content type info
 func (h *RecordHandler) Get(c echo.Context) error {
-	ct := c.Get("ct").(contenttype.ContentType)
+	ct := c.Get("contenttype").(contenttype.ContentType)
 	r, err := h.Storage.Record().Get(ct.Key, c.Param("key"))
 	if err != nil {
 		switch err {
@@ -106,12 +102,12 @@ func (h *RecordHandler) Get(c echo.Context) error {
 
 // Delete api action to delete a single content type
 func (h *RecordHandler) Delete(c echo.Context) error {
-	ct := c.Get("ct").(contenttype.ContentType)
+	ct := c.Get("contenttype").(contenttype.ContentType)
 	r, err := h.Storage.Record().Get(ct.Key, c.Param("key"))
 	if err != nil {
 		switch err {
 		case storm.ErrNotFound:
-			return c.JSON(http.StatusNotFound, "Record not found")
+			return ErrRecordNotFound
 		default:
 			return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
 		}
