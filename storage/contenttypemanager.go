@@ -14,5 +14,5 @@ type ContentTypeManager interface {
 	Delete(*contenttype.ContentType) error
 
 	// FindAll returns the complete list of all content types
-	FindAll() ([]*contenttype.ContentType, error)
+	FindAll() ([]contenttype.ContentType, error)
 }

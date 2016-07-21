@@ -51,8 +51,8 @@ func (s *ContentTypeStore) Delete(c *contenttype.ContentType) error {
 }
 
 // FindAll returns a list of all content types
-func (s *ContentTypeStore) FindAll() ([]*contenttype.ContentType, error) {
-	var ct []*contenttype.ContentType
+func (s *ContentTypeStore) FindAll() ([]contenttype.ContentType, error) {
+	var ct []contenttype.ContentType
 	err := s.db.All(&ct)
 
 	return ct, err

@@ -73,6 +73,14 @@ func (s *RecordStore) Get(contentType, key string) (record.Record, error) {
 	return rec, err
 }
 
+// GetRevisions returns a list of revisions for a given record
+func (s *RecordStore) GetRevisions(r *record.Record) ([]record.Revision, error) {
+	var revs []record.Revision
+	err := s.db.From(r.ContentType).Find("Key", r.Key, &revs)
+
+	return revs, err
+}
+
 // Delete removes a single record and all revesions
 func (s *RecordStore) Delete(r *record.Record) error {
 	err := s.DeleteRevisions(r)

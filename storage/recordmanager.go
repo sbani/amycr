@@ -10,6 +10,9 @@ type RecordManager interface {
 	// Get return a single record entry
 	Get(contentType, key string) (record.Record, error)
 
+	// GetRevisions returns a list of revisions for a given record
+	GetRevisions(*record.Record) ([]record.Revision, error)
+
 	// Delete removes a single record
 	Delete(*record.Record) error
 }

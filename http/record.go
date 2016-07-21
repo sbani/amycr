@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -33,7 +32,6 @@ func (h *RecordHandler) SetRoutes(e *echo.Echo) {
 	g.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Get content type
-			fmt.Println(c.Param("contenttype"))
 			ct, err := h.Storage.ContentType().Get(c.Param("contenttype"))
 			if err != nil {
 				switch err {
@@ -50,9 +48,30 @@ func (h *RecordHandler) SetRoutes(e *echo.Echo) {
 		}
 	})
 
+	rg := g.Group("/:key", func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			ct := c.Get("contenttype").(contenttype.ContentType)
+			r, err := h.Storage.Record().Get(ct.Key, c.Param("key"))
+			if err != nil {
+				switch err {
+				case storm.ErrNotFound:
+					return ErrRecordNotFound
+				default:
+					return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
+				}
+			}
+
+			c.Set("record", r)
+
+			return next(c)
+		}
+	})
+
 	// Group related (content type based)
 	g.GET("/:key", h.Get)
 	g.DELETE("/:key", h.Delete)
+
+	rg.GET("/revisions", h.ListRevisions)
 
 	// Not content type based
 	e.POST(RecordHandlerPath, h.Put)
@@ -86,18 +105,19 @@ func (h *RecordHandler) Put(c echo.Context) error {
 
 // Get api call to get content type info
 func (h *RecordHandler) Get(c echo.Context) error {
-	ct := c.Get("contenttype").(contenttype.ContentType)
-	r, err := h.Storage.Record().Get(ct.Key, c.Param("key"))
+	r := c.Get("record").(record.Record)
+	return c.JSON(http.StatusOK, r)
+}
+
+// ListRevisions lists all revisions for a given record
+func (h *RecordHandler) ListRevisions(c echo.Context) error {
+	r := c.Get("record").(record.Record)
+	revs, err := h.Storage.Record().GetRevisions(&r)
 	if err != nil {
-		switch err {
-		case storm.ErrNotFound:
-			return c.JSON(http.StatusNotFound, "Record not found")
-		default:
-			return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
-		}
+		return c.JSON(http.StatusBadRequest, errors.Wrap(err, "Storage").Error())
 	}
 
-	return c.JSON(http.StatusOK, r)
+	return c.JSON(http.StatusOK, revs)
 }
 
 // Delete api action to delete a single content type
