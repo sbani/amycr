@@ -68,7 +68,7 @@ func (s *RecordStore) Put(rec *record.Record) error {
 // Get return a single record entry
 func (s *RecordStore) Get(contentType, key string) (record.Record, error) {
 	var rec record.Record
-	err := s.db.From(contentType).One("Key", key, &rec)
+	err := s.db.From(contentType).From(headBucketName).One("Key", key, &rec)
 
 	return rec, err
 }

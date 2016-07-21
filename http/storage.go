@@ -14,7 +14,7 @@ type StorageHandler struct {
 }
 
 const (
-	// StatisticHandlerPath is root path for all statistic actions
+	// StatsHandlerPath is root path for all statistic actions
 	StatsHandlerPath = "/stats"
 
 	// BackupHandlerPath is the root path for all backup actions

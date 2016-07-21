@@ -51,6 +51,7 @@ func (m *BoltManager) GetStats() interface{} {
 	return m.ORM.Bolt.Stats()
 }
 
+// BackupDownload creates a download of the database file
 func (m *BoltManager) BackupDownload(resp engine.Response) error {
 	return m.ORM.Bolt.View(func(tx *bolt.Tx) error {
 		resp.Header().Set("Content-Type", "application/octet-stream")
