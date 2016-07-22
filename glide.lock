@@ -1,5 +1,5 @@
-hash: 95a3e371e7c526b6b4675e95b04da00bef85b95bc49c3ded6dc20a7c43beb7ab
-updated: 2016-07-21T08:41:32.707198383+02:00
+hash: c1d53f52169ee9235f78dcc83c68a11ce8dd0672a683e5560a605bf3bb4cfc50
+updated: 2016-07-22T08:29:34.557014073+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
@@ -15,8 +15,6 @@ imports:
   version: 99064174e013895bbd9b025c31100bd1d9b590ca
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
-- name: github.com/evanphx/json-patch
-  version: b49dc1f728861356c47692618c6b832fb00af335
 - name: github.com/fsnotify/fsnotify
   version: a8a77c9133d2d6fd8334f3260d06f60e8d80a5fb
 - name: github.com/hashicorp/hcl
@@ -91,6 +89,10 @@ imports:
   - fasthttputil
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
+- name: github.com/xeipuuv/gojsonpointer
+  version: e0fe6f68307607d540ed8eac07a342c33fa1b54a
+- name: github.com/xeipuuv/gojsonreference
+  version: e02fc20de94c78484cd5ffb007f8af96be030a45
 - name: github.com/xeipuuv/gojsonschema
   version: 66a3de92def23708184148ae337750915875e7c1
 - name: golang.org/x/net

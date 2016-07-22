@@ -16,7 +16,6 @@ import:
   version: ~1.2.1
 - package: github.com/satori/go.uuid
   version: ~1.1.0
-- package: github.com/evanphx/json-patch
 - package: github.com/labstack/echo
   version: ~2.0.2
 - package: gopkg.in/go-playground/validator.v8
