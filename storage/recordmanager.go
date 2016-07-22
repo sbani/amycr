@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/sbani/gcr/record"
+import "github.com/sbani/amycr/record"
 
 // RecordManager interface to store records in storage
 type RecordManager interface {

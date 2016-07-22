@@ -8,8 +8,8 @@ import (
 	"github.com/asdine/storm"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
-	"github.com/sbani/gcr/record"
-	"github.com/sbani/gcr/storage"
+	"github.com/sbani/amycr/record"
+	"github.com/sbani/amycr/storage"
 )
 
 // RecordHandler is the Handler for record

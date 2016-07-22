@@ -2,9 +2,9 @@ package server
 
 import (
 	"github.com/labstack/echo"
-	"github.com/sbani/gcr/config"
-	"github.com/sbani/gcr/http"
-	"github.com/sbani/gcr/storage"
+	"github.com/sbani/amycr/config"
+	"github.com/sbani/amycr/http"
+	"github.com/sbani/amycr/storage"
 )
 
 // newContentTypeHandler bootraps the hnadler for the content type

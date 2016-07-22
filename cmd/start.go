@@ -4,7 +4,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/fasthttp"
-	"github.com/sbani/gcr/cmd/cli/server"
+	"github.com/sbani/amycr/cmd/cli/server"
 	"github.com/spf13/cobra"
 )
 

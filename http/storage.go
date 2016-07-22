@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
-	"github.com/sbani/gcr/storage"
+	"github.com/sbani/amycr/storage"
 )
 
 // StorageHandler is the Handler for contenttype

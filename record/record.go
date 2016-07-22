@@ -3,7 +3,7 @@ package record
 import (
 	"time"
 
-	"github.com/sbani/gcr/contenttype"
+	"github.com/sbani/amycr/contenttype"
 )
 
 // Record represents the ready to use json from storage

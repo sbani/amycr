@@ -2,7 +2,7 @@ package storage
 
 import (
 	"github.com/pkg/errors"
-	"github.com/sbani/gcr/config"
+	"github.com/sbani/amycr/config"
 )
 
 // NewManager is the factory method to create the storage manager from config

@@ -9,8 +9,8 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"github.com/sbani/gcr/config"
-	"github.com/sbani/gcr/pkg"
+	"github.com/sbani/amycr/config"
+	"github.com/sbani/amycr/pkg"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -21,8 +21,8 @@ var mutex = &sync.RWMutex{}
 
 // RootCmd is the cobra command setup
 var RootCmd = &cobra.Command{
-	Use:   "gcr",
-	Short: "Content repo",
+	Use:   "amycr",
+	Short: "amyCR content repository",
 }
 
 // Execute the root cmd and print error if exists
@@ -36,7 +36,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gcr.yaml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.amycr.yaml)")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -48,8 +48,8 @@ func initConfig() {
 	}
 
 	path := absPathify("$HOME")
-	if _, err := os.Stat(filepath.Join(path, ".gcr.yml")); err != nil {
-		_, _ = os.Create(filepath.Join(path, ".gcr.yml"))
+	if _, err := os.Stat(filepath.Join(path, ".amycr.yml")); err != nil {
+		_, _ = os.Create(filepath.Join(path, ".amycr.yml"))
 	}
 
 	viper.SetConfigType("yaml")

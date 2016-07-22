@@ -4,10 +4,10 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/pkg/errors"
-	"github.com/sbani/gcr/config"
-	"github.com/sbani/gcr/http"
-	"github.com/sbani/gcr/pkg"
-	"github.com/sbani/gcr/storage"
+	"github.com/sbani/amycr/config"
+	"github.com/sbani/amycr/http"
+	"github.com/sbani/amycr/pkg"
+	"github.com/sbani/amycr/storage"
 )
 
 // Handler holds all other handlers and prepares them for routing

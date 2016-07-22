@@ -7,8 +7,8 @@ import (
 	"github.com/asdine/storm"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
-	"github.com/sbani/gcr/contenttype"
-	"github.com/sbani/gcr/storage"
+	"github.com/sbani/amycr/contenttype"
+	"github.com/sbani/amycr/storage"
 )
 
 // ContentTypeHandler is the Handler for contenttype

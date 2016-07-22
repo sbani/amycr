@@ -3,7 +3,7 @@ package boltdb
 import (
 	"github.com/asdine/storm"
 	"github.com/pkg/errors"
-	"github.com/sbani/gcr/record"
+	"github.com/sbani/amycr/record"
 )
 
 const (

@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/sbani/gcr/contenttype"
+import "github.com/sbani/amycr/contenttype"
 
 // ContentTypeManager interface to store contenttypes in storage
 type ContentTypeManager interface {

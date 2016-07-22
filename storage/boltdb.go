@@ -8,7 +8,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/labstack/echo/engine"
 	"github.com/pkg/errors"
-	"github.com/sbani/gcr/storage/boltdb"
+	"github.com/sbani/amycr/storage/boltdb"
 )
 
 // BoltManager is the Manager for the Key-Value-Store Boltdb
@@ -20,7 +20,7 @@ type BoltManager struct {
 
 // NewBoltManager is the factore method for BoltManager
 func NewBoltManager() *BoltManager {
-	storm, err := storm.Open("gcr.db")
+	storm, err := storm.Open("amycr.db")
 	if err != nil {
 		logrus.Fatal(errors.Wrap(err, "BoldManager"))
 	}

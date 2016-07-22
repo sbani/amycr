@@ -2,7 +2,7 @@ package boltdb
 
 import (
 	"github.com/asdine/storm"
-	"github.com/sbani/gcr/contenttype"
+	"github.com/sbani/amycr/contenttype"
 )
 
 // ContentTypeStore represents the content type store
