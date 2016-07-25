@@ -26,7 +26,7 @@ func NewRecordStore(db *storm.DB, cs *ContentTypeStore) *RecordStore {
 }
 
 // Put inserts or creates a new contenttype
-func (s *RecordStore) Put(rec *record.Record) error {
+func (s *RecordStore) Put(rec record.Record) error {
 	// Start a tx within the record's content type bucket
 	tx, err := s.db.From(rec.ContentType).Begin(true)
 	if err != nil {
@@ -42,7 +42,7 @@ func (s *RecordStore) Put(rec *record.Record) error {
 	}
 
 	// Create revision
-	rev, err := record.NewRevision(rec, &current)
+	rev, err := record.NewRevision(&rec, &current)
 	if err != nil {
 		return errors.Wrap(err, "Revision")
 	}
@@ -56,7 +56,7 @@ func (s *RecordStore) Put(rec *record.Record) error {
 	}
 
 	// Update record
-	err = head.Save(rec)
+	err = head.Save(&rec)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -74,7 +74,7 @@ func (s *RecordStore) Get(contentType, key string) (record.Record, error) {
 }
 
 // GetRevisions returns a list of revisions for a given record
-func (s *RecordStore) GetRevisions(r *record.Record) ([]record.Revision, error) {
+func (s *RecordStore) GetRevisions(r record.Record) ([]record.Revision, error) {
 	var revs []record.Revision
 	err := s.db.From(r.ContentType).From(revisionBucketName).Find("Key", r.Key, &revs)
 
@@ -82,31 +82,30 @@ func (s *RecordStore) GetRevisions(r *record.Record) ([]record.Revision, error) 
 }
 
 // Delete removes a single record and all revesions
-func (s *RecordStore) Delete(r *record.Record) error {
-	err := s.DeleteRevisions(r)
+func (s *RecordStore) Delete(r record.Record) error {
+	// Start tx
+	tx, err := s.db.From(r.ContentType).Begin(true)
 	if err != nil {
 		return err
 	}
 
-	return s.db.From(r.ContentType).Remove(r)
-}
-
-// DeleteRevisions removes all revisions of a record
-func (s *RecordStore) DeleteRevisions(r *record.Record) error {
-	var revs []record.Revision
-	err := s.db.From(r.ContentType).From(revisionBucketName).Find("Key", r.Key, &revs)
+	// Delete revisions
+	revs, err := s.GetRevisions(r)
 	if err != nil {
-		// If somebody removed the revisions of that record before, it's ok to find anything
-		if err == storm.ErrNotFound {
-			return nil
-		}
-
+		tx.Rollback()
 		return err
 	}
 
 	for _, revision := range revs {
-		s.db.Remove(&revision)
+		tx.From(revisionBucketName).Remove(&revision)
 	}
 
-	return nil
+	// Delete HEAD
+	err = tx.From(headBucketName).Remove(&r)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }

@@ -19,15 +19,14 @@ type Revision struct {
 // NewRevision create a new record revision
 func NewRevision(new *Record, old *Record) (Revision, error) {
 	var r Revision
-
+	fmt.Println(new, old)
 	if new == nil {
 		return r, errors.New("'new' is not allowed to be nil in NewRevision()")
 	}
 
 	var oldContent string
 	if old != nil {
-		//oldContent = old.Content
-		oldContent = "Voll der alte Content\noder auch nicht?\nfreakazoid"
+		oldContent = old.Content
 	}
 
 	dmp := diffmatchpatch.New()

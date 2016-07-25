@@ -48,7 +48,7 @@ func (h *RecordHandler) SetRoutes(e *echo.Echo) {
 
 			c.Set("contenttype", ct)
 
-			// Get rocord
+			// Get record
 			r, err := h.Storage.Record().Get(ct.Key, c.Param("key"))
 			if err != nil {
 				switch err {
@@ -75,10 +75,11 @@ func (h *RecordHandler) SetRoutes(e *echo.Echo) {
 // Put api call to create or updates a content type.
 // Expecting a post request
 func (h *RecordHandler) Put(c echo.Context) error {
-	r := new(record.Record)
+	var r record.Record
+	r.Revision = time.Now()
 
 	// Bind input
-	if err := c.Bind(r); err != nil {
+	if err := c.Bind(&r); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -106,7 +107,7 @@ func (h *RecordHandler) Get(c echo.Context) error {
 // ListRevisions lists all revisions for a given record
 func (h *RecordHandler) ListRevisions(c echo.Context) error {
 	r := c.Get("record").(record.Record)
-	revs, err := h.Storage.Record().GetRevisions(&r)
+	revs, err := h.Storage.Record().GetRevisions(r)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, errors.Wrap(err, "Storage").Error())
 	}
@@ -131,7 +132,7 @@ func (h *RecordHandler) ListRevisions(c echo.Context) error {
 // Delete api action to delete a single content type
 func (h *RecordHandler) Delete(c echo.Context) error {
 	r := c.Get("record").(record.Record)
-	err := h.Storage.Record().Delete(&r)
+	err := h.Storage.Record().Delete(r)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
 	}

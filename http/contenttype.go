@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sbani/amycr/contenttype"
 	"github.com/sbani/amycr/storage"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 // ContentTypeHandler is the Handler for contenttype
@@ -33,10 +34,10 @@ func (h *ContentTypeHandler) SetRoutes(e *echo.Echo) {
 // Put api call to create or updates a content type.
 // Expecting a post request
 func (h *ContentTypeHandler) Put(c echo.Context) error {
-	ct := new(contenttype.ContentType)
+	var ct contenttype.ContentType
 
 	// Bind input
-	if err := c.Bind(ct); err != nil {
+	if err := c.Bind(&ct); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -46,6 +47,15 @@ func (h *ContentTypeHandler) Put(c echo.Context) error {
 	} else if !v {
 		return c.JSON(http.StatusBadRequest, errors.New("Payload did not validate.").Error())
 	}
+
+	// Validate schema
+	l := gojsonschema.NewStringLoader(ct.Validation)
+	schema, err := gojsonschema.NewSchema(l)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, errors.Wrap(err, "Schema not valid").Error())
+	}
+
+	ct.SetSchema(schema)
 
 	// Put to storage
 	if err := h.Storage.Put(ct); err != nil {
@@ -92,7 +102,7 @@ func (h *ContentTypeHandler) Delete(c echo.Context) error {
 		}
 	}
 
-	err = h.Storage.Delete(&ct)
+	err = h.Storage.Delete(ct)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errors.Wrap(err, "Storage").Error())
 	}
