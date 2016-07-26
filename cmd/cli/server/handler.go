@@ -25,7 +25,6 @@ func (h *Handler) Start(c *config.Config, e *echo.Echo) {
 		pkg.Must(errors.Wrap(err, "Storage"))
 	}
 
-	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
 
 	h.ContentType = newContentTypeHandler(c, e, storage.ContentType())

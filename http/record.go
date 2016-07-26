@@ -8,8 +8,10 @@ import (
 	"github.com/asdine/storm"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
+	"github.com/sbani/amycr/contenttype"
 	"github.com/sbani/amycr/record"
 	"github.com/sbani/amycr/storage"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 // RecordHandler is the Handler for record
@@ -22,21 +24,17 @@ const (
 	RecordHandlerPath = "/record"
 
 	// RecordContentTypeHandlerPath is the root path for all record actions related to a content type
-	RecordContentTypeHandlerPath = RecordHandlerPath + "/:contenttype/:key"
+	RecordContentTypeHandlerPath = RecordHandlerPath + "/:contenttype"
 )
 
 // SetRoutes adds the routes related to the handler
 func (h *RecordHandler) SetRoutes(e *echo.Echo) {
-	// Not content type based
-	e.POST(RecordHandlerPath, h.Put)
-	e.PUT(RecordHandlerPath, h.Put)
-
-	// Group all routes which need content types and check (and set) the content type
-	g := e.Group(RecordContentTypeHandlerPath)
-	g.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+	gc := e.Group(RecordContentTypeHandlerPath)
+	gc.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Get content type
-			ct, err := h.Storage.ContentType().Get(c.Param("contenttype"))
+			// TODO: use contenttype named param instead of ID
+			ct, err := h.Storage.ContentType().Get(c.P(0))
 			if err != nil {
 				switch err {
 				case storm.ErrNotFound:
@@ -48,6 +46,17 @@ func (h *RecordHandler) SetRoutes(e *echo.Echo) {
 
 			c.Set("contenttype", ct)
 
+			return next(c)
+		}
+	})
+
+	gc.POST("", h.Put)
+	gc.PUT("", h.Put)
+
+	gcr := gc.Group("/:key")
+	gcr.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			ct := c.Get("contenttype").(contenttype.ContentType)
 			// Get record
 			r, err := h.Storage.Record().Get(ct.Key, c.Param("key"))
 			if err != nil {
@@ -66,10 +75,10 @@ func (h *RecordHandler) SetRoutes(e *echo.Echo) {
 	})
 
 	// Group related (content type based)
-	g.GET("", h.Get)
-	g.DELETE("", h.Delete)
+	gcr.GET("", h.Get)
+	gcr.DELETE("", h.Delete)
 
-	g.GET("/revisions", h.ListRevisions)
+	gcr.GET("/revisions", h.ListRevisions)
 }
 
 // Put api call to create or updates a content type.
@@ -88,6 +97,20 @@ func (h *RecordHandler) Put(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	} else if !v {
 		return c.JSON(http.StatusBadRequest, errors.New("Payload did not validate.").Error())
+	}
+
+	// Validate against schema
+	ct := c.Get("contenttype").(contenttype.ContentType)
+	result, err := ct.Schema().Validate(gojsonschema.NewStringLoader(r.Content))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	} else if !result.Valid() {
+		errs := result.Errors()
+		ret := make(map[string]string, len(errs))
+		for _, err := range errs {
+			ret[err.Field()] = err.Description()
+		}
+		return c.JSON(http.StatusBadRequest, ret)
 	}
 
 	// Put to storage

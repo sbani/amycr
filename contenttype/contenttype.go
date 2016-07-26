@@ -1,8 +1,6 @@
 package contenttype
 
 import (
-	"fmt"
-
 	"github.com/hashicorp/golang-lru"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -22,9 +20,8 @@ func init() {
 }
 
 // Schema returns the prepared json schema
-func (c *ContentType) Schema() *gojsonschema.Schema {
+func (c ContentType) Schema() *gojsonschema.Schema {
 	if v, ok := schemaCache.Get(c.Key); ok {
-		fmt.Println("Loaded schema FROM CACHE")
 		return v.(*gojsonschema.Schema)
 	}
 
